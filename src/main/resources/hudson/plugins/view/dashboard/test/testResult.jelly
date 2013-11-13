@@ -1,0 +1,76 @@
+<!--
+The MIT License
+
+Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<!--
+  <%@ attribute name="tr" required="true" type="hudson.plugins.view.dashboard.test.TestResult" %>
+  <%@ attribute name="rowColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="successColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="skippedColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="failureColor" required="false" type="java.lang.String" %>
+-->
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:dp="/hudson/plugins/view/dashboard" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+<tr style="border: 1px #bbb solid;" class="status${bc.ordinal()}">
+<j:if test="${it.useBackgroundColors}">
+		<td data="${bc.ordinal()}" align="left" style="background-color:#${rowColor}">
+		<img src="${bc.getImageOf('16x16')}" alt="${bc.description}" title="${bc.description}" onClick="toggleStatus('${bc.ordinal()}')"/>
+		</td>
+	    <td align="left" style="background-color:#${rowColor}">
+	      <dp:jobLink job="${tr.job}" noIconColor="true"/>
+	    </td>
+	    <td align="right" style="background-color:#${successColor}">
+	       ${tr.success}
+	    </td>
+	    <td align="right" style="background-color:#${successColor}">
+	       ${it.format(format, tr.successPct)}
+	    </td>
+	    <td align="right" style="background-color:#${failureColor}">
+	       ${tr.failed}
+	    </td>
+	    <td align="right" style="background-color:#${failureColor}">
+	       ${it.format(format, tr.failedPct)}
+	    </td>
+	    <td align="right" style="background-color:#${skippedColor}">
+	       ${tr.skipped}
+	    </td>
+	    <td align="right" style="background-color:#${skippedColor}">
+	       ${it.format(format, tr.skippedPct)}
+	    </td>
+	    <td align="right" style="background-color:#${rowColor}">
+	       ${tr.tests}
+		</td>
+</j:if>
+<j:if test="${!it.useBackgroundColors}">
+		<t:ballColorTd it="${bc}" style="${indenter.getRelativeShift(job)}"/>
+		<td align="left"><dp:jobLink job="${tr.job}" noIconColor="true"/></td>
+		<td align="right">${tr.success}</td>
+		<td align="right">${it.format(format, tr.successPct)}</td>
+		<td align="right">${tr.failed}</td>
+		<td align="right">${it.format(format, tr.failedPct)}</td>
+		<td align="right">${tr.skipped}</td>
+		<td align="right">${it.format(format, tr.skippedPct)}</td>
+		<td align="right">${tr.tests}</td>
+</j:if>
+</tr>
+</j:jelly>

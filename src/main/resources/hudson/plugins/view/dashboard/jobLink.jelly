@@ -28,13 +28,19 @@ THE SOFTWARE.
       <st:attribute name="job" type="hudson.model.Job" use="required">
       Job object to be displayed.
       </st:attribute>
+      <st:attribute name="noIconColor" type="boolean">
+      Show the BallColor from job.iconColor?
+    </st:attribute>
+      
    </st:documentation>
 
   <!--t:buildHealth job="${job}" td="false" style="${indenter.getRelativeShift(job)}" iconSize="16x16"
       link="${jobBaseUrl}${job.shortUrl}lastBuild" /-->
+   <j:if test="${!attrs.noIconColor}">
    <img src="${job.iconColor.getImageOf('16x16')}"
       alt="${job.iconColor.description}"
       title="${job.iconColor.description}"/>
+   </j:if>
    <img src="${rootURL}${job.buildHealth.getIconUrl('16x16')}"
       alt="${job.buildHealth.description}"
       title="${job.buildHealth.description}" />
