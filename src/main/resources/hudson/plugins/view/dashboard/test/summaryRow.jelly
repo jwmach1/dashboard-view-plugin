@@ -1,0 +1,64 @@
+<!--
+The MIT License
+
+Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<!--
+  <%@ attribute name="tr" required="true" type="hudson.plugins.view.dashboard.test.TestResult" %>
+  <%@ attribute name="rowColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="successColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="skippedColor" required="false" type="java.lang.String" %>
+  <%@ attribute name="failureColor" required="false" type="java.lang.String" %>
+-->
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:dp="/hudson/plugins/view/dashboard" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+<j:if test="${it.isCategorizationTypeJobName()}">
+	<tr data="${bc}" class="rollup${bc}" style="display:none;">
+		<td data="${bc}" align="left"><a href="#" onClick="toggleStatus('${bc}')" style="text-decoration: none;">${bc}</a></td>
+		<td align="left"><st:nbsp/></td>
+		<td align="right">${subTotal.success}</td>
+		<td align="right">${it.format(format, subTotal.successPct)}</td>
+		<td align="right">${subTotal.failed}</td>
+		<td align="right">${it.format(format, subTotal.failedPct)}</td>
+		<td align="right">${subTotal.skipped}</td>
+		<td align="right">${it.format(format, subTotal.skippedPct)}</td>
+		<td align="right">${subTotal.tests}</td>
+	</tr>
+</j:if>
+<j:if test="${it.isCategorizationTypeBallColor()}">
+	<tr data="${bc.ordinal()}" class="rollup${bc.ordinal()}" style="display:none;">
+		<td data="${bc.ordinal()}" align="left">
+			<a href="#" onClick="toggleStatus('${bc.ordinal()}')" style="text-decoration: none;">
+			<img src="${bc.getImageOf('16x16')}" alt="${bc.description}" title="${bc.description}"/>
+			</a>
+		</td>
+		<td align="left"><st:nbsp/></td>
+		<td align="right">${subTotal.success}</td>
+		<td align="right">${it.format(format, subTotal.successPct)}</td>
+		<td align="right">${subTotal.failed}</td>
+		<td align="right">${it.format(format, subTotal.failedPct)}</td>
+		<td align="right">${subTotal.skipped}</td>
+		<td align="right">${it.format(format, subTotal.skippedPct)}</td>
+		<td align="right">${subTotal.tests}</td>
+	</tr>
+</j:if>
+</j:jelly>

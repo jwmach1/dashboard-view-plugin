@@ -31,11 +31,26 @@ THE SOFTWARE.
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:dp="/hudson/plugins/view/dashboard" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-<tr style="border: 1px #bbb solid;" class="status${bc.ordinal()}">
+<j:if test="${it.isCategorizationTypeJobName()}">
+	<j:set var="statusClass" value="${bc}" />
+</j:if>
+<j:if test="${it.isCategorizationTypeBallColor()}">
+	<j:set var="statusClass" value="${bc.ordinal()}" />
+</j:if>
+
+
+<tr style="border: 1px #bbb solid;" class="status${statusClass}">
 <j:if test="${it.useBackgroundColors}">
-		<td data="${bc.ordinal()}" align="left" style="background-color:#${rowColor}">
-		<img src="${bc.getImageOf('16x16')}" alt="${bc.description}" title="${bc.description}" onClick="toggleStatus('${bc.ordinal()}')"/>
-		</td>
+		<j:if test="${it.isCategorizationTypeJobName()}">
+     		<td><a href="#" onClick="toggleStatus('${bc}')" style="text-decoration: none;">${bc}</a></td>
+     	</j:if>
+     	<j:if test="${it.isCategorizationTypeBallColor()}">
+			<td data="${bc.ordinal()}" align="left" style="background-color:#${rowColor}">
+				<a href="#" onClick="toggleStatus('${bc.ordinal()}')" style="text-decoration: none;">
+				<img src="${bc.getImageOf('16x16')}" alt="${bc.description}" title="${bc.description}"/>
+				</a>
+			</td>
+     	</j:if>
 	    <td align="left" style="background-color:#${rowColor}">
 	      <dp:jobLink job="${tr.job}" noIconColor="true"/>
 	    </td>
@@ -62,7 +77,12 @@ THE SOFTWARE.
 		</td>
 </j:if>
 <j:if test="${!it.useBackgroundColors}">
-		<t:ballColorTd it="${bc}" style="${indenter.getRelativeShift(job)}"/>
+		<j:if test="${it.isCategorizationTypeJobName()}">
+     		<td>${bc}</td>
+     	</j:if>
+     	<j:if test="${it.isCategorizationTypeJobName()}">
+     		<t:ballColorTd it="${bc}" style="${indenter.getRelativeShift(job)}"/>
+     	</j:if>
 		<td align="left"><dp:jobLink job="${tr.job}" noIconColor="true"/></td>
 		<td align="right">${tr.success}</td>
 		<td align="right">${it.format(format, tr.successPct)}</td>

@@ -13,4 +13,5 @@ function toggleStatus(statusOrdinal) {
 			});
 		}
 	});
+	return false;
 }

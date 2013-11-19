@@ -1,17 +1,25 @@
 package hudson.plugins.view.dashboard.test;
 
 import hudson.Extension;
+import hudson.maven.reporters.SurefireAggregatedReport;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.plugins.view.dashboard.DashboardPortlet;
+import hudson.plugins.view.dashboard.test.CategorizationType.TestStatisticCategorization;
 
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.plugins.view.dashboard.Messages;
+import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.TestResultProjectAction;
+
 import java.text.DecimalFormat;
 
 /**
@@ -24,6 +32,7 @@ public class TestStatisticsPortlet extends DashboardPortlet {
 	private String skippedColor;
 	private String successColor;
 	private String failureColor;
+	private CategorizationType categorizationType;
 
 	@DataBoundConstructor
 	public TestStatisticsPortlet(String name, String successColor, String failureColor, String skippedColor, boolean useBackgroundColors) {
@@ -34,8 +43,45 @@ public class TestStatisticsPortlet extends DashboardPortlet {
 		this.useBackgroundColors = useBackgroundColors;
 	}
 
-	public TestResultSummary getTestResultSummary(Collection<TopLevelItem> jobs) {
-		return TestUtil.getTestResultSummary(jobs);
+	public GroupedTestResultSummary<?> getTestResultSummary(Collection<TopLevelItem> jobs) {
+		GroupedTestResultSummary<?> summary = null;
+		switch(categorizationType.getTestStatisticCategorization()) {
+		case BALL_COLOR:
+			summary = new GroupedTestResultSummaryByBallColor();
+			break;
+		case JOB_NAME:
+			summary = new GroupedTestResultSummaryByJobName((JobNameCategorizationType) categorizationType);
+			break;
+		}
+		for (TopLevelItem item : jobs) {
+	           if (item instanceof Job) {
+	                Job job = (Job) item;
+	                boolean addBlank = true;
+	                TestResultProjectAction testResults = job.getAction(TestResultProjectAction.class);
+
+	                if (testResults != null) {
+	                    AbstractTestResultAction tra = testResults.getLastTestResultAction();
+
+	                    if (tra != null) {
+	                       addBlank = false;
+	                       summary.addTestResult(new TestResult(job, tra.getTotalCount(), tra.getFailCount(), tra.getSkipCount()));
+	                    }
+	                } else {
+	                    SurefireAggregatedReport surefireTestResults = job.getAction(SurefireAggregatedReport.class);
+	                    if (surefireTestResults != null) {
+	                       addBlank = false;
+	                       summary.addTestResult(new TestResult(job, surefireTestResults.getTotalCount(), surefireTestResults.getFailCount(), surefireTestResults.getSkipCount()));
+	                    }
+	                }
+
+	                if (addBlank) {
+	                    summary.addTestResult(new TestResult(job, 0, 0, 0));
+	                }
+	           }
+	      }
+
+		TestUtil.getTestResultSummary(jobs);
+		return summary;
 	}
 
 	public String format(DecimalFormat df, double val) {
@@ -76,21 +122,21 @@ public class TestStatisticsPortlet extends DashboardPortlet {
 		}
 		return successColor;
 	}
-	
-	public void setUseBackgroundColors(boolean useBackgroundColors) {
-		this.useBackgroundColors = useBackgroundColors;
+		
+	public CategorizationType getCategorizationType() {
+		return categorizationType;
 	}
 	
-	public void setSkippedColor(String skippedColor) {
-		this.skippedColor = skippedColor;
+	public void setCategorizationType(CategorizationType categorizationType) {
+		this.categorizationType = categorizationType;
 	}
-
-	public void setSuccessColor(String successColor) {
-		this.successColor = successColor;
+	
+	public boolean isCategorizationTypeJobName() {
+		return TestStatisticCategorization.JOB_NAME.equals(categorizationType.getTestStatisticCategorization());
 	}
-
-	public void setFailureColor(String failureColor) {
-		this.failureColor = failureColor;
+	
+	public boolean isCategorizationTypeBallColor() {
+		return TestStatisticCategorization.BALL_COLOR.equals(categorizationType.getTestStatisticCategorization());
 	}
 
 	@Extension
@@ -99,6 +145,14 @@ public class TestStatisticsPortlet extends DashboardPortlet {
 		@Override
 		public String getDisplayName() {
 			return Messages.Dashboard_TestStatisticsGrid();
+		}
+		@Override
+		public DashboardPortlet newInstance(StaplerRequest req,
+				JSONObject formData)
+				throws hudson.model.Descriptor.FormException {
+			TestStatisticsPortlet newInstance = (TestStatisticsPortlet) super.newInstance(req, formData);
+			newInstance.setCategorizationType(new CategorizationTypeBuilder().build(req, formData.getJSONObject("categorizationType")));
+			return newInstance;
 		}
 	}
 }

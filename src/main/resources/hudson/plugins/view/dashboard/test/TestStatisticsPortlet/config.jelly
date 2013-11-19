@@ -37,4 +37,17 @@ THE SOFTWARE.
 	    <f:textbox name="skippedColor" field="skippedColor" default="FDB813" />
 	  </f:entry>
   </f:optionalBlock>
+
+  <f:radioBlock name="categorizationType" value="BALL_COLOR" title="${%Job Status Categorization}" checked="${instance.categorizationTypeBallColor}">
+  </f:radioBlock>
+
+  <f:radioBlock name="categorizationType" value="JOB_NAME" title="${%Job Name Regex Categorization}" checked="${instance.categorizationTypeJobName}">
+	<f:entry title="${%Regex for categorization}" help="/plugin/categorized-view/groupNameExpression.html">
+		<f:textbox name="groupRegex" field="groupRegex" value="${instance.categorizationType.groupRegex}"/>
+	</f:entry>
+	<f:entry title="${%Naming Rule}"  help="/plugin/categorized-view/namingRule.html">
+		<f:textbox name="namingRule" field="namingRule" value="${instance.categorizationType.namingRule}"/>
+	</f:entry>
+  </f:radioBlock>
+  
 </j:jelly>
